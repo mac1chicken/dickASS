@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
@@ -24,11 +24,6 @@ def create_app():
 
     create_database(app)
 
-    new_user = User(email="admin@admin", first_name="Daria", password=generate_password_hash(
-                "123", method='sha256'), role="Admin")
-    db.session.add(new_user)
-    db.session.commit()
-    user = User.query.filter_by(email=email).first()
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
@@ -40,8 +35,9 @@ def create_app():
     return app
 
 
-
 def create_database(app):
+    from .models import User
     if not path.exists('website/' + DB_NAME):
+
         db.create_all(app=app)
         print('Created Database!')
